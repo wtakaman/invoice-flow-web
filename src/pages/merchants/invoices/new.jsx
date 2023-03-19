@@ -2,7 +2,7 @@ import {Component} from "react";
 import Layout from "../../../components/Layout";
 import { Router } from '../../../routes'
 import {Button, Form, Input, Message} from "semantic-ui-react";
-import {CampaignService} from "../../services/merchants";
+import {MerchantService} from "../../services/merchants";
 
 class InvoiceNew extends Component {
 
@@ -21,15 +21,11 @@ class InvoiceNew extends Component {
 
     onSubmit = async event => {
         event.preventDefault();
-        const {description, value, recipient} = this.state;
+        const {invoiceId, customerAddress, token, amount, expiresIn} = this.state;
 
         try {
             this.setState({ errorMessage: '', loading: true })
-            await CampaignService.createRequest(
-                description,
-                value,
-                recipient
-            );
+            await MerchantService.registerInvoice(invoiceId, customerAddress, token, amount, expiresIn);
             this.setState({ loading: false})
             Router.pushRoute(`/invoices/${this.props.address}/requests`);
         } catch (err) {
@@ -43,31 +39,38 @@ class InvoiceNew extends Component {
                 <h3>Create New Invoice</h3>
                 <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
                     <Form.Field>
+                        <label>Invoice Id</label>
+                        <Input
+                          value={this.state.invoiceId}
+                          onChange={event => this.setState({invoiceId: event.target.value})}
+                        />
+                    </Form.Field>
+                    <Form.Field>
                         <label>Customer's address</label>
                         <Input
-                            value={this.state.description}
-                            onChange={event => this.setState({description: event.target.value})}
+                            value={this.state.customerAddress}
+                            onChange={event => this.setState({customerAddress: event.target.value})}
                         />
                     </Form.Field>
                     <Form.Field>
                         <label>Token</label>
                         <Input
-                            value={this.state.value}
-                            onChange={event => this.setState({value: event.target.value})}
+                            value={this.state.token}
+                            onChange={event => this.setState({token: event.target.value})}
                         />
                     </Form.Field>
                     <Form.Field>
-                        <label>Value</label>
+                        <label>Amount</label>
                         <Input
-                            value={this.state.value}
-                            onChange={event => this.setState({value: event.target.value})}
+                            value={this.state.amount}
+                            onChange={event => this.setState({amount: event.target.value})}
                         />
                     </Form.Field>
                     <Form.Field>
                         <label>Expires in</label>
                         <Input
-                            value={this.state.recipient}
-                            onChange={event => this.setState({recipient: event.target.value})}
+                            value={this.state.expiresIn}
+                            onChange={event => this.setState({expiresIn: event.target.value})}
                         />
                     </Form.Field>
                     <Message error header={"Oops!"} content={this.state.errorMessage} />

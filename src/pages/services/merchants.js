@@ -1,31 +1,31 @@
-import Campaign from '../../services/invoiceFlow';
+import InvoiceFlowContract from '../../services/invoiceFlow';
 import factory from '../../services/factory';
 import web3 from '../../services/web3';
 
-async function createCampaign(
-  title,
-  twitter,
-  image,
-  minimumContribution,
+async function createMerchant(
+  owners,
+  withdrawAddress,
+  acceptedTokens,
+  requiredSignatures,
 ) {
   const accounts = await web3.eth.getAccounts();
-  await factory.methods.createCampaign(
-    title,
-    twitter,
-    image,
-    minimumContribution,
+  await factory.methods.createInvoiceFlowContract(
+    owners,
+    withdrawAddress,
+    acceptedTokens,
+    requiredSignatures,
   ).send({
     from: accounts[0],
   });
 }
 
-async function getDeployedCampaigns() {
+async function getDeployedInvoiceFlowContracts() {
   // eslint-disable-next-line no-return-await
-  return await factory.methods.getDeployedCampaigns().call();
+  return await factory.methods.getDeployedInvoiceFlowContracts().call();
 }
 
 async function createRequest(description, weiValue, recipient) {
-  const campaign = Campaign(recipient);
+  const campaign = InvoiceFlowContract(recipient);
   const accounts = await web3.eth.getAccounts();
   await campaign.methods.createRequest(
     description,
@@ -35,26 +35,37 @@ async function createRequest(description, weiValue, recipient) {
     from: accounts[0],
   });
 }
-async function getCampaignSummary(address) {
-  const campaign = Campaign(address);
-  const summary = await campaign.methods.getSummary().call();
+async function getSummary(address) {
+  const merchant = InvoiceFlowContract(address);
+  const summary = await merchant.methods.getSummary().call();
   return {
     address,
-    title: summary[0],
-    twitter: summary[1],
-    image: summary[2],
-    minimumContribution: summary[3],
-    balance: summary[4],
-    requestsCount: summary[5],
-    approversCount: summary[6],
-    manager: summary[7],
+    owners: summary[0],
+    supportedTokenList: summary[1],
+    withdrawAddress: summary[2],
+    requiredApprovals: summary[3],
   };
 }
 
+async function getBalance(address, token) {
+  const merchant = InvoiceFlowContract(address);
+  const balance = await merchant.methods.getBalance(token).call();
+  return balance;
+}
+
+async function getInvoiceIds(address) {
+  const merchant = InvoiceFlowContract(address);
+  const invoices = await merchant.methods.getInvoiceIds().call();
+  return invoices;
+  // return invoices;
+}
+
 // eslint-disable-next-line import/prefer-default-export
-export const CampaignService = {
-  getCampaignSummary,
-  getDeployedCampaigns,
-  createCampaign,
+export const MerchantService = {
+  getSummary,
+  getDeployedInvoiceFlowContracts,
+  createMerchant,
   createRequest,
+  getBalance,
+  getInvoiceIds,
 };

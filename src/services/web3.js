@@ -14,6 +14,7 @@ if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
   // We are on the server *OR* the user is not running metamask
   const provider = new Web3.providers.HttpProvider(
     'https://goerli.infura.io/v3/c724b894f0ae4562929cf69a3cf648f5',
+    // 'https://polygon-mumbai.g.alchemy.com/v2/WKPf3DBJuYP7P53XXe8SlGmpARpK10IL',
   );
   web3 = new Web3(provider);
 }

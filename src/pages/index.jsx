@@ -1,7 +1,7 @@
 import {Button, Card} from 'semantic-ui-react';
 import Layout from "../components/Layout";
 import {Link} from '../routes';
-import {CampaignService} from "./services/merchants";
+import {MerchantService} from "./services/merchants";
 const {Component} = require("react");
 
 class MerchantIndex extends Component {
@@ -11,14 +11,14 @@ class MerchantIndex extends Component {
     }
 
     async componentDidMount() {
-        const merchants = await CampaignService.getDeployedCampaigns();
+        const merchants = await MerchantService.getDeployedInvoiceFlowContracts();
         const merchantList = await this.renderCampaigns(merchants)
         this.setState({merchantList});
     }
 
     async renderCampaigns(campaigns) {
         const items = await Promise.all(campaigns.map(async address => {
-            const summary = await CampaignService.getCampaignSummary(address);
+            const summary = await MerchantService.getSummary(address);
             return {
                 header: summary.title,
                 description: (

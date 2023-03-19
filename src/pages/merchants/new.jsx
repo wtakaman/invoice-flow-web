@@ -2,13 +2,13 @@ import {Component} from "react";
 import Layout from "../../components/Layout";
 import {Button, Form, Input, Message} from "semantic-ui-react";
 import {Router} from '../../routes'
-import {CampaignService} from "../services/merchants";
+import {MerchantService} from "../services/merchants";
 
 class MerchantNew extends Component {
     state = {
-        owners: [],
+        owners: '',
         withdrawAddress: '',
-        acceptedTokens: [],
+        acceptedTokens: '',
         requiredOwnersApprovals: 0,
         errorMessage: '',
         loading: false
@@ -18,10 +18,12 @@ class MerchantNew extends Component {
         event.preventDefault();
         try {
             this.setState({errorMessage: '', loading: true})
-            await CampaignService.createCampaign(
-              this.state.owners,
+            const ownersList = this.state.owners.indexOf(',') ? this.state.owners.split(",") : [this.state.owners]
+            const acceptedTokensList = this.state.acceptedTokens.indexOf(',') ? this.state.acceptedTokens.split(",") : [this.state.acceptedTokens]
+            await MerchantService.createMerchant(
+              ownersList,
               this.state.withdrawAddress,
-              this.state.acceptedTokens,
+              acceptedTokensList,
               this.state.requiredOwnersApprovals
             );
             this.setState({loading: false})
@@ -41,18 +43,18 @@ class MerchantNew extends Component {
                     <Form.Field>
                         <label>Owners</label>
                         <Input
-                            value={this.state.title}
+                            value={this.state.owners}
                             onChange={
-                                event => this.setState({title: event.target.value})
+                                event => this.setState({owners: event.target.value})
                             }
                         />
                     </Form.Field>
                     <Form.Field>
                         <label>Accepted tokens</label>
                         <Input
-                            value={this.state.twitter}
+                            value={this.state.acceptedTokens}
                             onChange={
-                                event => this.setState({twitter: event.target.value})
+                                event => this.setState({acceptedTokens: event.target.value})
                             }
                         />
                     </Form.Field>

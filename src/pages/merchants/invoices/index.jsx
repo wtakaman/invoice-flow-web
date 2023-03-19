@@ -1,9 +1,7 @@
 import { Component } from 'react';
 import { Button, Table } from 'semantic-ui-react';
-import Layout from '../../../components/Layout';
 import { Link } from '../../../routes';
-import Campaign from '../../../services/invoiceFlow';
-import InvoiceRow from '../../../components/InvoiceRow';
+import { MerchantService } from '../../services/merchants';
 
 class MerchantInvoices extends Component {
   constructor(props) {
@@ -17,35 +15,20 @@ class MerchantInvoices extends Component {
   }
   async componentDidMount() {
     const { address } = this.props;
-    const campaign = Campaign(address);
-    const requestsCount = await campaign.methods.requestsCount()
-      .call();
-    const approversCount = await campaign.methods.approversCount()
-      .call();
-    const requests = await Promise.all(
-      Array(parseInt(requestsCount))
-        .fill()
-        .map((element, index) => {
-          console.log(` index${index}`);
-          return campaign.methods.requests(index)
-            .call();
-        }),
-    );
+    const invoices = await MerchantService.getInvoiceIds(address);
     this.setState( {
       address,
-      requests,
-      approversCount,
-      requestsCount,
+      invoices,
     });
   }
 
   renderRows() {
-    return this.state.requests.map((request, index) => (
+    return this.state.invoices?.map((invoice, index) => (
       <InvoiceRow
         key={index}
         id={index}
-        request={request}
-        approverCount={this.state.approversCount}
+        invoice={invoice}
+        // approverCount={this.state.approversCount}
         address={this.state.address}
       />
     ));
@@ -55,6 +38,9 @@ class MerchantInvoices extends Component {
     const {
       Header, Row, HeaderCell, Body,
     } = Table;
+    const { invoices, address } = this.state;
+
+    console.log({ invoices, address });
     return (
       <>
         <Table>
@@ -73,10 +59,10 @@ class MerchantInvoices extends Component {
           </Body>
         </Table>
         <div>
-          { `Found ${this.state.requestsCount} invoices.` }
+          { `Found ${invoices?.length || 0} invoices.` }
         </div>
         <div className="ui divider"></div>
-        <Link route={`/merchants/${this.state.address}/invoices/new`}>
+        <Link route={`/merchants/${address}/invoices/new`}>
           <a>
             <Button
               content="Create Invoice"

@@ -1,7 +1,7 @@
 import web3 from './web3';
-import Campaign from './contracts/Campaign.json';
+import InvoiceFlowContract from './contracts/InvoiceFlowContract.json';
 
 export default (address) => new web3.eth.Contract(
-  Campaign.abi,
+  InvoiceFlowContract.abi,
   address,
 );
